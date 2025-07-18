@@ -3,6 +3,11 @@
 #include <string.h>
 #include "com_example_jni_ReferenceCall.h"
 
+
+// 駅すぱあとのコアライブラリ
+// バージョン取得のサンプルコード
+// DLL header data 用意されてるものからロードする
+
 // 1. Stringを処理する関数
 JNIEXPORT jstring JNICALL Java_com_example_jni_ReferenceCall_processString(JNIEnv *env, jobject obj, jstring input) {
     // JavaのString (jstring) を Cの文字列 (const char*) に変換
@@ -30,6 +35,7 @@ JNIEXPORT jstring JNICALL Java_com_example_jni_ReferenceCall_processString(JNIEn
 // 2. UserDataオブジェクトを処理する関数
 JNIEXPORT void JNICALL Java_com_example_jni_ReferenceCall_processUserData(JNIEnv *env, jobject obj, jobject userData) {
     // UserDataクラスへの参照を取得
+	//// 引数でクラスの実体が渡ってきているのでそこからクラスの定義を起こすときはGetObjectClassでよい　イチから作るときはFindClass
     jclass userDataClass = (*env)->GetObjectClass(env, userData);
     if (userDataClass == NULL) {
         return;
@@ -71,4 +77,3 @@ JNIEXPORT void JNICALL Java_com_example_jni_ReferenceCall_processUserData(JNIEnv
     // メモリ解放
     (*env)->ReleaseStringUTFChars(env, currentName, nativeName);
 }
-

@@ -44,6 +44,10 @@ JNIEXPORT jstring JNICALL Java_com_example_jni_StringManipulator_concatenateStri
     printf("C native method received: \"%s\" and \"%s\"\n", cStr1, cStr2);
     printf("C native method concatenated result: \"%s\"\n", resultCStr);
 
+    // 出力バッファリング
+    // JavaのSystem.outとC言語のprintfは、同じコンソールに出力しているように見えますが、内部的にはそれぞれが**別々のバッファ（データを一時的に溜めておく場所）**を持っています。
+    fflush(stdout);
+
     // Cのchar*をJavaのjstringに変換
     jstring javaResult = (*env)->NewStringUTF(env, resultCStr);
 

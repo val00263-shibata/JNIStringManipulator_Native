@@ -9,10 +9,16 @@ void put_integer(JNIEnv *env, jobject map, jmethodID put_method, const char* key
     jclass intClass = (*env)->FindClass(env, "java/lang/Integer");
     if (intClass == NULL) return;
     // 2. intを引数に取るコンストラクタのIDを取得
+    //// メソッド名を渡す　"<init>"はコンストラクタ
+    //// 引数と返り値を渡す　"(I)V"　→　I int V void　→　void (int)
     jmethodID intConstructor = (*env)->GetMethodID(env, intClass, "<init>", "(I)V");
     if (intConstructor == NULL) return;
     // 3. Cのint値からIntegerオブジェクトを生成
     jobject intObject = (*env)->NewObject(env, intClass, intConstructor, value);
+
+    //// JavaのHashMap（やListなどのコレクション）が、プリミティブ型（intなど）を直接格納できず
+    //// オブジェクトしか格納できない
+    //// map.put("key", 123);　→　map.put("key", new Integer(123));
 
     // 4. putメソッドを呼び出す
     jstring jKey = (*env)->NewStringUTF(env, key);
@@ -38,6 +44,8 @@ void put_custom_data(JNIEnv *env, jobject map, jmethodID put_method, const char*
     if (customClass == NULL) return;
 
     // 2. コンストラクタIDを取得 (Stringとintを引数に取る)
+    //// メソッド名を渡す　"<init>"はコンストラクタ
+    //// 引数と返り値を渡す　"(Ljava/lang/String;I)V"　→　Ljava/lang/String; L<クラス名>　I int V void　→　void (string, int)
     jmethodID customConstructor = (*env)->GetMethodID(env, customClass, "<init>", "(Ljava/lang/String;I)V");
     if (customConstructor == NULL) return;
 
@@ -45,6 +53,7 @@ void put_custom_data(JNIEnv *env, jobject map, jmethodID put_method, const char*
     jstring jInfo = (*env)->NewStringUTF(env, info);
 
     // 4. MyCustomDataオブジェクトを生成
+    //// C側では具体的なクラス型で変数を取れない　→　jobject
     jobject customObject = (*env)->NewObject(env, customClass, customConstructor, jInfo, value);
 
     // 5. putメソッドでHashMapに追加

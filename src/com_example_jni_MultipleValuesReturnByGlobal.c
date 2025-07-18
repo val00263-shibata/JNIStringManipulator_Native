@@ -15,6 +15,7 @@ JNIEXPORT void JNICALL Java_com_example_jni_MultipleValuesReturnByGlobal_setValu
     g_int_value = val1;
 
     // グローバルバッファに文字列をコピー
+    //// strncpyで使えるようにjstringをchar*に変換する
     const char *nativeString = (*env)->GetStringUTFChars(env, val2, 0);
     strncpy(g_string_buffer, nativeString, sizeof(g_string_buffer) - 1);
     g_string_buffer[sizeof(g_string_buffer) - 1] = '\0'; // 念のため終端文字
@@ -42,15 +43,18 @@ JNIEXPORT jintArray JNICALL Java_com_example_jni_MultipleValuesReturnByGlobal_ge
 
 JNIEXPORT void JNICALL Java_com_example_jni_MultipleValuesReturnByGlobal_setJavaStaticFields(JNIEnv *env, jobject obj, jint val1, jstring val2) {
     // 1. クラスの参照を取得
+	//// クラス名はフルパスで長くなるのでリテラル定数に切った方がいいかも
     jclass cls = (*env)->FindClass(env, "com/example/jni/MultipleValuesReturnByGlobal");
     if (cls == NULL) return;
 
     // 2. 静的フィールドのIDを取得
+    //// cからjavaのグローバル変数を触る(GET)
     jfieldID intFieldID = (*env)->GetStaticFieldID(env, cls, "staticIntValue", "I");
     jfieldID stringFieldID = (*env)->GetStaticFieldID(env, cls, "staticStringValue", "Ljava/lang/String;");
     if (intFieldID == NULL || stringFieldID == NULL) return;
 
     // 3. 静的フィールドに値を設定
+    //// cからjavaのグローバル変数を触る(SET)
     (*env)->SetStaticIntField(env, cls, intFieldID, val1 + 100);
     (*env)->SetStaticObjectField(env, cls, stringFieldID, val2);
 }
@@ -80,3 +84,8 @@ JNIEXPORT jstring JNICALL Java_com_example_jni_MultipleValuesReturnByGlobal_getJ
 
     return (*env)->NewStringUTF(env, buffer);
 }
+
+// C側の構造体で返す
+// java側のlong型にポインタを受ける
+// 構造体からのメンバ変数の操作はC側のネイティブメソッドを用意する
+// ファイナライズの処理　ポインタの開放

@@ -14,6 +14,7 @@ JNIEXPORT void JNICALL Java_com_example_jni_MultipleValuesReturnByArray_getIntsI
 
     // Javaのint配列をCで操作するためのポインタを取得
     // isCopyがNULLでなければ、JavaのヒープからCのメモリにコピーされる
+    //// javaの配列はcと違ってメモリアドレスが連続していないかもしれない　GetIntArrayElementsでポインタを取ると連続してない場合は再配置してくれる
     jboolean isCopy;
     jint *body = (*env)->GetIntArrayElements(env, outputArray, &isCopy);
     if (body == NULL) {
@@ -44,6 +45,7 @@ JNIEXPORT jintArray JNICALL Java_com_example_jni_MultipleValuesReturnByArray_get
 
     // 3. Cのバッファの内容を、Javaの配列にコピーする
     // (*env)->Set<Type>ArrayRegion(env, javaArray, startIndex, copyLength, c_buffer);
+    //// SetIntArrayRegion関数はCのメモリ上にある連続したデータブロック（配列）をJavaの配列にコピーするためのものなので、Cの配列（バッファ）を経由する必要があります。
     (*env)->SetIntArrayRegion(env, javaArray, 0, 2, c_buffer);
 
     // 4. 生成したJava配列の参照を返す
